@@ -20,7 +20,7 @@
       <div class="card-body">
         <h5 class="card-title">{{ item.name }}</h5>
         <h6 class="card-text">{{ item.description }}<br><br></h6>
-        <p class="card-subtitle mb-2 text-muted">Distance: {{Math.sqrt(((currentLat-item['lat'])**2)+((currentLong-item['lon'])**2))*69}} miles</p>
+        <p class="card-subtitle mb-2 text-muted">Distance: {{Math.sqrt((((currentLat-item['lat'])**2)+((currentLong-item['lon'])**2))*69).toFixed(3)}} miles</p>
       </div>
     </div>
   </div>
