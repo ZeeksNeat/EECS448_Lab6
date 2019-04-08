@@ -13,19 +13,18 @@
 </head>
 <body>
 
-  <div class="container">
-     <div id="app">
-       {{ message }}
-     </div>
+<div class="container" id="bus">
+  <input v-model.number = "numStops" type = "number">
+  <div v-for="item in filteredStops">
+    <div class="card" style="width: 22rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ item.name }}</h5>
+        <h6 class="card-text">{{ item.description }}<br><br></h6>
+        <p class="card-subtitle mb-2 text-muted">Distance: {{Math.sqrt(((currentLat-item['lat'])**2)+((currentLong-item['lon'])**2))*69}} miles</p>
+      </div>
+    </div>
   </div>
-
-<div id="bus">
-  <ol>
-    <stops
-      v-for="item in busStops"
-      v-bind:stop="item"
-      v-bind:key="item.id"
-    ></stops>
+    </li>
   </ol>
 </div>
 
@@ -58,31 +57,45 @@
 </script>
 
 <script>
+  var bus = new Vue({
+    el: '#bus',
+    data: {
+      busStops: [],
+      numStops: 10,
+      currentLat: 0,
+      currentLong: 0
+    },
+    computed: {
+      filteredStops: function() {
+        this.busStops.sort((a, b) => (distance(this.currentLat, this.currentLong, a['lat'], a['lon']) > distance(this.currentLat, this.currentLong, b['lat'], b['lon']) ) ? 1 : -1);
+        return this.busStops.slice(0, this.numStops)
+      }
+    }
+  })
+</script>
+
+<script>
   fetch('https://utils.pauliankline.com/stops.json')
     .then(function(response) {
       return response.json();
     })
     .then(function(myJson) {
-      bus.busStops.push(myJson);
+      bus.busStops = myJson;
     })
-</script>
 
-<script>
-  var bus = new Vue({
-    el: '#bus',
-    data: {
-      busStops: []
+    if ("geolocation" in navigator) {
+       console.log("Geolocation online.");
+     } else {
+       app.message = "Can't connect to location";
+     }
+    var watchID = navigator.geolocation.watchPosition(function(position) {
+      bus.currentLat = position.coords.latitude;
+      bus.currentLong = position.coords.longitude;
+    });
+    function distance(lat1, long1, lat2, long2)
+    {
+      return Math.sqrt(((lat1-lat2)**2)+((long1-long2)**2));
     }
-  })
-</script>
-
-<script>
-  const app = new Vue({
-    el: '#app',
-    data: {
-      message: 'Closest Bus Stops'
-    }
-  })
 </script>
 
 </body>
